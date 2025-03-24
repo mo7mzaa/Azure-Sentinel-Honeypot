@@ -71,8 +71,28 @@ az vm create \
 
 
 
+# Step 3: Create Log Analytics Workspace
+
+  logWorkspace="SentinelWorkspace"
+  resourceGroup="Honeypot_RG"
+  location="westus2"
+
+  az monitor log-analytics workspace create \
+    --resource-group $resourceGroup \
+    --workspace-name $logWorkspace \
+    --location $location
 
 
+
+
+# Step 4: Enable Microsoft Sentinel on the Workspace
+
+  logWorkspace="SentinelWorkspace"
+  resourceGroup="Honeypot_RG"
+
+  az sentinel workspace create \
+    --resource-group $resourceGroup \
+    --workspace-name $logWorkspace
 
 
 
