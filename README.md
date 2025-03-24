@@ -71,7 +71,7 @@ az vm create \
 
 
 
-# Step 3: Create Log Analytics Workspace
+# Step 03: Create Log Analytics Workspace
 
   logWorkspace="SentinelWorkspace"
   resourceGroup="Honeypot_RG"
@@ -95,4 +95,51 @@ az vm create \
     --workspace-name $logWorkspace
 
 
+# Step 5: Connect the VM to Log Analytics
+
+
+  # Variables (Update these values accordingly)
+    resourceGroup="Honeypot_RG"
+    vmName="AzureSentinelHoneypotVM"
+    workspaceName="log-honeypot"
+    workspaceResourceGroup="Honeypot_RG" 
+    location="westus2" 
+
+  # Get Workspace ID
+    workspaceId=$(az monitor log-analytics workspace show \
+    --resource-group "$workspaceResourceGroup" \
+    --workspace-name "$workspaceName" \
+    --query customerId -o tsv)
+
+  # Connect VM to Log Analytics workspace
+    az vm extension set \
+    --resource-group "$resourceGroup" \
+    --vm-name "$vmName" \
+    --name "OmsAgentForLinux" \
+    --publisher "Microsoft.EnterpriseCloud.Monitoring" \
+    --settings "{\"workspaceId\":\"$workspaceId\"}"
+
+    echo "VM '$vmName' has been connected to Log Analytics Workspace '$workspaceName'"
+
+
+
+# Step 06: Detection Rules in Microsoft Sentinel
+  
+  1. Go to Microsoft Sentinel --> Analytics -->  Create --> Scheduled rule
+  2. Or Second way: Go to Workspace Log Analytics --> Logs --> KQL Query
+  2. Execute Query KQL
+     SecurityEvent
+      | where EventID == 4625
+      | where AccountType == "User"
+      | summarize FailedAttempts = count() by Account, bin(TimeGenerated, 1h)
+      | where FailedAttempts >= 5
+
+
+# Step 7: Disable the Firewall in Virtual Machine
+  1. Go to Virtual Machine "AzureSentinelHoneypotVM"
+  2. Log into the VM via Remote Desktop Protocol (RDP) with credentials
+  3. Select NO for all Choose privacy settings for your device
+  4. Click Start and search for "wf.msc" (Windows Defender Firewall)
+  5. Click "Windows Defender Firewall Properties"
+  6. Turn Firewall State OFF for Domain Profile Private Profile and Public Profile
 
