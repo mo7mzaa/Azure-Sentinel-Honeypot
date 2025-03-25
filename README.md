@@ -39,8 +39,8 @@ az login
 resourceGroup="Honeypot_RG"
 location="westus2"
 vmName="AzureSentinelHoneypotVM"
-Username: "put your
-Password: "put your
+adminUser="mo7mzaa"
+adminPassword="Bcsf12@0271122"
 
 # Create Resource Group
 az group create --name $resourceGroup --location $location
